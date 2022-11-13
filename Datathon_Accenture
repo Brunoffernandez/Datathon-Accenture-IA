@@ -1,0 +1,74 @@
+import numpy as np
+import pandas as pd
+df_orders = pd.read_csv("orders.csv", sep=";")
+df_cities = pd.read_csv("cities_data.csv", sep=";")
+df_cities_costs = pd.read_csv("cities_data_costs.csv", sep=";")
+df_products_attributes = pd.read_csv("product_attributes.csv", sep=";")
+df_product_weight_class = pd.read_csv("product_weight_class.csv", sep=";")
+df_test = pd.read_csv("test.csv", sep=";")
+df_cities_girado = df_cities.rename(columns={"city_to_name":"city_from_name", "city_from_name":"city_to_name"})
+df_cities_bueno = pd.concat([df_cities, df_cities_girado], ignore_index=False)
+df_cities_bueno
+df_orders['origin_port'] = df_orders['origin_port'].replace("ATHENAS", "Athens")
+df_orders['origin_port'] = df_orders['origin_port'].replace("BCN", "Barcelona")
+df_orders = pd.merge(df_orders, df_cities_bueno, left_on = ['origin_port', 'logistic_hub'], right_on = ['city_from_name', 'city_to_name'], how = 'left')
+df_orders = df_orders.drop(columns={'origin_port', 'city_from_name', 'city_to_name'})
+df_orders = df_orders.rename(columns={'city_from_coord':'origin_port', 'city_to_coord':'logistic_hub1', 'distance':'distance1'})
+df_orders = pd.merge(df_orders, df_cities_bueno, left_on = ['logistic_hub', 'customer'], right_on = ['city_from_name', 'city_to_name'], how = 'left')
+df_orders = df_orders.drop(columns={'logistic_hub', 'customer', 'city_from_name', 'city_to_name', 'city_from_coord'})
+df_orders = df_orders.rename(columns={'city_to_coord':'customer', 'logistic_hub1':'logistic_hub', 'distance':'distance2'})
+df_orders['3pl'] = df_orders['3pl'].replace("v_001", 1)
+df_orders['3pl'] = df_orders['3pl'].replace("v_002", 2)
+df_orders['3pl'] = df_orders['3pl'].replace("v_003", 3)
+df_orders['3pl'] = df_orders['3pl'].replace("v_004", 4)
+df_orders['customs_procedures'] = df_orders['customs_procedures'].replace("DTP", 1)
+df_orders['customs_procedures'] = df_orders['customs_procedures'].replace("CRF", 2)
+df_orders['customs_procedures'] = df_orders['customs_procedures'].replace("DTD", 3)
+df_orders_no_coord = df_orders.drop(columns={'origin_port', 'logistic_hub', 'customer'})
+df_orders_no_coord = df_orders_no_coord.fillna(0)
+df_train = df_orders_no_coord.drop(columns={'late_order', 'order_id'})
+df_train.to_csv('x_train')
+df_y_train = df_orders_no_coord['late_order']
+df_y_train.to_csv('y_train')
+df_test['origin_port'] = df_test['origin_port'].replace("ATHENAS", "Athens")
+df_test['origin_port'] = df_test['origin_port'].replace("BCN", "Barcelona")
+df_test = pd.merge(df_test, df_cities_bueno, left_on = ['origin_port', 'logistic_hub'], right_on = ['city_from_name', 'city_to_name'], how = 'left')
+df_test = df_test.drop(columns={'origin_port', 'city_from_name', 'city_to_name'})
+df_test = df_test.rename(columns={'city_from_coord':'origin_port', 'city_to_coord':'logistic_hub1', 'distance':'distance1'})
+df_test = pd.merge(df_test, df_cities_bueno, left_on = ['logistic_hub', 'customer'], right_on = ['city_from_name', 'city_to_name'], how = 'left')
+df_test = df_test.drop(columns={'logistic_hub', 'customer', 'city_from_name', 'city_to_name', 'city_from_coord'})
+df_test = df_test.rename(columns={'city_to_coord':'customer', 'logistic_hub1':'logistic_hub', 'distance':'distance2'})
+df_test['3pl'] = df_test['3pl'].replace("v_001", 1)
+df_test['3pl'] = df_test['3pl'].replace("v_002", 2)
+df_test['3pl'] = df_test['3pl'].replace("v_003", 3)
+df_test['3pl'] = df_test['3pl'].replace("v_004", 4)
+df_test['customs_procedures'] = df_test['customs_procedures'].replace("DTP", 1)
+df_test['customs_procedures'] = df_test['customs_procedures'].replace("CRF", 2)
+df_test['customs_procedures'] = df_test['customs_procedures'].replace("DTD", 3)
+df_test_no_coord = df_test.drop(columns={'origin_port', 'logistic_hub', 'customer'})
+df_test_no_coord = df_test_no_coord.fillna(0)
+df_test_no_coord
+df_late_order = df_orders['late_order']
+df_order_id = df_orders['order_id']
+df_lin_var = df_orders.drop(columns={'3pl', 'customs_procedures', 'product_id', 'late_order'})
+df_class_var = df_orders[['3pl', 'customs_procedures', 'product_id']]
+from xgboost import XGBClassifier
+import xgboost as xgb
+from sklearn.model_selection import train_test_split
+from sklearn.metrics import accuracy_score
+from sklearn.model_selection import GridSearchCV
+
+xgb_model = xgb.XGBClassifier()
+optimization_dict = {'max_depth': [4,8,12],
+                     'n_estimators': [200,400,800]}
+model = GridSearchCV(xgb_model, optimization_dict, scoring= 'accuracy', verbose = 1)
+
+x_train = df_orders_no_coord.drop(columns={'late_order', 'order_id'})
+y_train = df_orders_no_coord['late_order']
+
+x_test = df_test_no_coord.drop('order_id', axis=1)
+
+model.fit(x_train, y_train)
+pred_proba = model.predict_proba(x_test)
+submission = pd.DataFrame({"order_id": df_test_no_coord.order_id, "late_order": pred_proba[:,1]})
+submission.to_csv("submission_kaggle.csv", index=False)
