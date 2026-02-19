@@ -1,10 +1,10 @@
-# 📦 Logistics Late Orders Predictor
+# Logistics Late Orders Predictor
 
 This Machine Learning project aims to predict the probability of a logistics order being delayed (`late_order`). It uses a supervised classification pipeline based on **XGBoost**, optimizing hyperparameters through `GridSearchCV` to ensure high accuracy.
 
 
 
-## 📋 Project Overview
+## Project Overview
 
 In the supply chain and logistics sector, anticipating delays is crucial for maintaining customer satisfaction and optimizing warehouse resources. This project processes multiple relational datasets—including city coordinates, distances, and product attributes—to build a robust predictive model.
 
@@ -16,7 +16,7 @@ In the supply chain and logistics sector, anticipating delays is crucial for mai
 4. **Model Training & Optimization:** Deployment of an `XGBClassifier` iterating over tree depth (`max_depth`) and the number of estimators (`n_estimators`) via a grid search.
 5. **Prediction Output:** Generation of probability scores for the test set, formatted automatically for Kaggle competitions.
 
-## 🗂️ Data Structure Requirements
+## Data Structure Requirements
 
 To run this notebook successfully, ensure the following datasets (CSV format, separated by `;`) are located in the root directory:
 
@@ -29,13 +29,13 @@ To run this notebook successfully, ensure the following datasets (CSV format, se
 | `product_attributes.csv` | Specific characteristics of the items being shipped. |
 | `product_weight_class.csv` | Categorization of products based on their physical weight. |
 
-## 🛠️ Tech Stack
+## Tech Stack
 
 * **Programming Language:** Python 3.x
 * **Data Manipulation:** `pandas`, `numpy`
 * **Machine Learning:** `xgboost`, `scikit-learn` (`GridSearchCV`, `train_test_split`, `accuracy_score`)
 
-## 🚀 Installation & Execution
+## Installation & Execution
 
 1. **Clone this repository** to your local machine:
    ```bash
