@@ -34,3 +34,10 @@ To run this notebook successfully, ensure the following datasets (CSV format, se
 * **Programming Language:** Python 3.x
 * **Data Manipulation:** `pandas`, `numpy`
 * **Machine Learning:** `xgboost`, `scikit-learn` (`GridSearchCV`, `train_test_split`, `accuracy_score`)
+
+## Expected Output
+
+Upon successful execution, the script will output a file named `submission_kaggle.csv` in the root directory. This file will contain two columns:
+
+* **`order_id`**: The unique identifier for the test order.
+* **`late_order`**: A float value between 0.0 and 1.0 representing the model's predicted probability that the order will arrive late.
