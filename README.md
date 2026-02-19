@@ -34,10 +34,3 @@ To run this notebook successfully, ensure the following datasets (CSV format, se
 * **Programming Language:** Python 3.x
 * **Data Manipulation:** `pandas`, `numpy`
 * **Machine Learning:** `xgboost`, `scikit-learn` (`GridSearchCV`, `train_test_split`, `accuracy_score`)
-
-## Installation & Execution
-
-1. **Clone this repository** to your local machine:
-   ```bash
-   git clone [https://github.com/YOUR_GITHUB_USERNAME/YOUR_REPOSITORY_NAME.git](https://github.com/YOUR_GITHUB_USERNAME/YOUR_REPOSITORY_NAME.git)
-   cd YOUR_REPOSITORY_NAME
